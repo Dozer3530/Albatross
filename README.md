@@ -67,14 +67,18 @@ You need two things once: **Python** and a **free Copernicus account**.
   tracked field (multi-layer files are read in full).
 - **Scan for passes** — happens automatically on page load; the SCAN button
   re-queries on demand. New acquisitions show an amber **NEW** badge, with
-  per-scene cloud cover from the catalog.
+  per-scene cloud cover from the catalog. Use the **lookback dropdown** next to
+  SCAN (6 months / 1 year / 2 years / 5 years / all) to pull in older passes
+  from the archive.
 - **Acquire & analyze** — downloads the field's pixels at 10 m for that date via
   the Sentinel Hub Process API (clipped to the boundary, ~KBs instead of a ~1 GB
   full scene), computes NDVI, cloud-in-field %, and stats.
 - **Overlays** — toggle NDVI / RGB overlays on the satellite basemap; opacity
   slider in the map legend.
 - **Timeline** — the NDVI chart tracks the field's mean NDVI across every
-  processed pass.
+  processed pass. Each processed pass has an **IN NDVI TREND** toggle — click it
+  to drop a cloudy or off outlier from the trend line (the image itself is kept,
+  just excluded from the graph), and click again to add it back.
 - **Downloads** — per pass: NDVI GeoTIFF (float32, -9999 nodata), NDVI colormap
   PNG, true-color PNG, and the SCL scene-classification TIFF.
 

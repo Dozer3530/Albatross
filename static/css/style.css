@@ -245,6 +245,17 @@ main {
 .side-head > span:first-child::before { content: "✦ "; color: var(--acid); }
 .side-count { color: var(--acid); }
 
+.scan-controls { display: flex; align-items: center; gap: 6px; }
+#lookbackSelect {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em;
+  color: var(--ink); background: #0d0d0f;
+  border: 1px solid var(--line-bright);
+  padding: 4px 6px; cursor: pointer;
+}
+#lookbackSelect:hover { border-color: #cfcfd6; }
+#lookbackSelect:focus { outline: none; border-color: var(--acid); }
+#lookbackSelect option { background: #0d0d0f; color: var(--ink); }
+
 #fieldList { display: flex; flex-direction: column; gap: 8px; }
 
 .field-card {
@@ -424,6 +435,7 @@ main {
 }
 .chip-new { color: #000; background: var(--mag); border-color: var(--mag); animation: pulse 1.6s infinite; }
 .chip-ok { color: var(--acid); border-color: rgba(204, 255, 0, 0.45); }
+.chip-off { color: var(--faint); border-color: var(--line-bright); border-style: dashed; }
 
 .sc-cloud {
   display: flex; align-items: center; gap: 7px; margin-top: 7px;
@@ -434,6 +446,21 @@ main {
 
 .sc-actions { margin-top: 10px; display: flex; gap: 8px; }
 .sc-actions .btn { flex: 1; }
+
+/* excluded-from-trend passes read as dimmed/struck */
+.scene-card.sc-excluded .sc-thumb,
+.scene-card.sc-excluded .sc-ndvi-big,
+.scene-card.sc-excluded .sc-minmax { opacity: .45; }
+.scene-card.sc-excluded .sc-ndvi-big { text-decoration: line-through; text-shadow: none; }
+
+/* in-trend / exclude toggle */
+.sc-trend { margin-top: 10px; }
+.sc-trend-btn { width: 100%; letter-spacing: .14em; }
+.sc-trend-btn.active { color: #0a0c00; background: var(--acid); border-color: var(--acid); }
+.sc-trend-btn:not(.active) {
+  color: var(--muted); background: transparent; border-color: var(--line-bright); border-style: dashed;
+}
+.sc-trend-btn:not(.active):hover { color: #000; background: #e8e8ee; border-style: solid; }
 
 .sc-result { display: flex; gap: 12px; margin-top: 11px; }
 .sc-thumb {

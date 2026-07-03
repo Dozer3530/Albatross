@@ -215,6 +215,7 @@ async function selectField(fieldId) {
   renderFieldLayers();
 
   $("#passPanel").classList.remove("hidden");
+  $("#lookbackSelect").value = "";
   MAP.invalidateSize();
   MAP.fitBounds(geoBounds(field.geometry).pad(0.25));
 
@@ -279,9 +280,12 @@ function sceneCard(scene) {
   const cloud = scene.cloud_cover === null || scene.cloud_cover === undefined
     ? null : Math.round(scene.cloud_cover);
   const processed = scene.status === "processed";
+  const excluded = !!scene.trend_excluded;
+  if (processed && excluded) card.classList.add("sc-excluded");
 
   let chips = "";
   if (scene.status === "new") chips += `<span class="chip chip-new">NEW</span>`;
+  if (processed && excluded) chips += `<span class="chip chip-off">OFF TREND</span>`;
   if (processed) chips += `<span class="chip chip-ok">ACQUIRED</span>`;
   else chips += `<span class="chip">CATALOG</span>`;
 
@@ -315,6 +319,12 @@ function sceneCard(scene) {
           </div>
         </div>
       </div>
+      <div class="sc-trend">
+        <button class="btn btn-tiny sc-trend-btn ${excluded ? "" : "active"}"
+                title="${excluded ? "This pass is excluded from the NDVI trend graph — click to add it back" : "This pass counts toward the NDVI trend graph — click to exclude it (e.g. too cloudy)"}">
+          ${excluded ? "&#9675; ADD TO TREND" : "&#10003; IN NDVI TREND"}
+        </button>
+      </div>
       <div class="sc-footer">
         <span class="sc-footer-label">OVERLAY</span>
         <div class="seg">
@@ -345,7 +355,30 @@ function sceneCard(scene) {
   const thumb = card.querySelector(".sc-thumb");
   if (thumb) thumb.addEventListener("click", () => showOverlay(scene, "ndvi"));
 
+  const trendBtn = card.querySelector(".sc-trend-btn");
+  if (trendBtn) trendBtn.addEventListener("click", () => toggleTrend(scene, trendBtn));
+
   return card;
+}
+
+async function toggleTrend(scene, btn) {
+  const nextExcluded = !scene.trend_excluded;
+  btn.disabled = true;
+  try {
+    const body = await api(`/api/scenes/${scene.id}/trend?excluded=${nextExcluded}`, { method: "POST" });
+    const updated = body.scene;
+    const idx = State.scenes.findIndex((s) => s.id === updated.id);
+    if (idx >= 0) State.scenes[idx] = updated;
+    renderScenes();
+    await refreshChart();
+    await loadFields();
+    toast(nextExcluded
+      ? `${fmtDate(updated.date)} REMOVED FROM TREND`
+      : `${fmtDate(updated.date)} ADDED TO TREND`, nextExcluded ? "warn" : "ok");
+  } catch (err) {
+    toast(err.message, "err", 7000);
+    btn.disabled = false;
+  }
 }
 
 async function processScene(scene, btn) {
@@ -373,19 +406,26 @@ async function processScene(scene, btn) {
 async function scanField() {
   if (!State.selected) return;
   const btn = $("#checkFieldBtn");
+  const days = $("#lookbackSelect").value;
+  const label = $("#lookbackSelect").selectedOptions[0].textContent;
+  const url = `/api/fields/${State.selected.id}/check${days ? `?days=${days}` : ""}`;
   btn.disabled = true;
+  const original = btn.innerHTML;
+  if (days) btn.innerHTML = `<span class="spin">&#10227;</span> SCANNING…`;
   try {
-    const body = await api(`/api/fields/${State.selected.id}/check`, { method: "POST" });
+    const body = await api(url, { method: "POST" });
     State.scenes = body.scenes;
     renderScenes();
+    const scope = days ? ` (${label})` : "";
     toast(body.new > 0
-      ? `${body.new} NEW PASS${body.new > 1 ? "ES" : ""} // ${State.selected.name.toUpperCase()}`
-      : `NO NEW PASSES // ${State.selected.name.toUpperCase()}`, body.new > 0 ? "ok" : "warn");
+      ? `${body.new} NEW PASS${body.new > 1 ? "ES" : ""}${scope} // ${State.selected.name.toUpperCase()}`
+      : `NO NEW PASSES${scope} // ${State.selected.name.toUpperCase()}`, body.new > 0 ? "ok" : "warn");
     await loadFields();
   } catch (err) {
     toast(err.message, "err", 7000);
   } finally {
     btn.disabled = false;
+    btn.innerHTML = original;
   }
 }
 

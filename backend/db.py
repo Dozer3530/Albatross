@@ -40,9 +40,15 @@ CREATE TABLE IF NOT EXISTS scenes (
     ndvi_std     REAL,
     clear_pct    REAL,
     cloud_pct    REAL,
+    trend_excluded INTEGER NOT NULL DEFAULT 0,
     UNIQUE (field_id, date)
 );
 """
+
+# Columns added after the first release; applied to existing databases on init.
+MIGRATIONS = [
+    ("scenes", "trend_excluded", "ALTER TABLE scenes ADD COLUMN trend_excluded INTEGER NOT NULL DEFAULT 0"),
+]
 
 
 def utcnow() -> str:
@@ -60,6 +66,10 @@ def connect() -> sqlite3.Connection:
 def init_db() -> None:
     with connect() as conn:
         conn.executescript(SCHEMA)
+        for table, column, ddl in MIGRATIONS:
+            cols = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
+            if column not in cols:
+                conn.execute(ddl)
 
 
 # ---------------------------------------------------------------- settings
@@ -110,7 +120,7 @@ SELECT f.*,
   (SELECT COUNT(*) FROM scenes s WHERE s.field_id = f.id) AS scene_count,
   (SELECT MAX(s.date) FROM scenes s WHERE s.field_id = f.id) AS latest_date,
   (SELECT s.ndvi_mean FROM scenes s
-     WHERE s.field_id = f.id AND s.ndvi_mean IS NOT NULL
+     WHERE s.field_id = f.id AND s.ndvi_mean IS NOT NULL AND s.trend_excluded = 0
      ORDER BY s.date DESC LIMIT 1) AS latest_ndvi
 FROM fields f
 """
@@ -196,11 +206,20 @@ def update_scene_processed(scene_id: int, result: dict) -> None:
         )
 
 
+def set_scene_trend(scene_id: int, excluded: bool) -> None:
+    with connect() as conn:
+        conn.execute(
+            "UPDATE scenes SET trend_excluded = ? WHERE id = ?",
+            (1 if excluded else 0, scene_id),
+        )
+
+
 def timeseries(field_id: int) -> list:
     with connect() as conn:
         rows = conn.execute(
             "SELECT date, ndvi_mean, ndvi_min, ndvi_max, cloud_cover, cloud_pct "
-            "FROM scenes WHERE field_id = ? AND ndvi_mean IS NOT NULL ORDER BY date",
+            "FROM scenes WHERE field_id = ? AND ndvi_mean IS NOT NULL "
+            "AND trend_excluded = 0 ORDER BY date",
             (field_id,),
         ).fetchall()
     return [dict(r) for r in rows]

@@ -128,10 +128,20 @@ def mark_seen(field_id: int):
 
 # ------------------------------------------------------- scene discovery
 
-def _check_field(field: dict) -> int:
-    """Search the catalog for acquisitions over this field; returns # new."""
+SENTINEL2_EPOCH = datetime(2015, 6, 23, tzinfo=timezone.utc).date()  # first S-2 data
+
+
+def _check_field(field: dict, days: Optional[int] = None) -> int:
+    """Search the catalog for acquisitions over this field; returns # new.
+
+    days=None → incremental scan (since last check, or 60d on first run).
+    days=N    → deep scan reaching N days back regardless of last check,
+                so historical passes can be pulled in on demand.
+    """
     today = datetime.now(timezone.utc).date()
-    if field.get("last_checked"):
+    if days is not None:
+        date_from = max(SENTINEL2_EPOCH, today - timedelta(days=days))
+    elif field.get("last_checked"):
         last = datetime.strptime(field["last_checked"][:10], "%Y-%m-%d").date()
         date_from = last - timedelta(days=RECHECK_OVERLAP_DAYS)
     else:
@@ -155,25 +165,32 @@ def _check_field(field: dict) -> int:
     return new_count
 
 
+def _clamp_days(days: Optional[int]) -> Optional[int]:
+    if days is None:
+        return None
+    return max(1, min(days, 4000))  # ~11 years, covers the full S-2 archive
+
+
 @app.post("/api/fields/{field_id}/check")
-def check_field(field_id: int):
+def check_field(field_id: int, days: Optional[int] = None):
     field = db.get_field(field_id)
     if not field:
         raise HTTPException(status_code=404, detail="Field not found")
     try:
-        new_count = _check_field(field)
+        new_count = _check_field(field, days=_clamp_days(days))
     except copernicus.CopernicusError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return {"field_id": field_id, "new": new_count, "scenes": db.list_scenes(field_id)}
 
 
 @app.post("/api/check-all")
-def check_all():
+def check_all(days: Optional[int] = None):
     fields = db.list_fields()
     results = []
+    clamped = _clamp_days(days)
     try:
         for field in fields:
-            results.append({"field_id": field["id"], "new": _check_field(field)})
+            results.append({"field_id": field["id"], "new": _check_field(field, days=clamped)})
     except copernicus.CopernicusError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return {"results": results, "total_new": sum(r["new"] for r in results)}
@@ -204,6 +221,16 @@ def process_scene(scene_id: int):
     except copernicus.CopernicusError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     db.update_scene_processed(scene_id, result)
+    return {"scene": db.get_scene(scene_id)}
+
+
+@app.post("/api/scenes/{scene_id}/trend")
+def set_scene_trend(scene_id: int, excluded: bool):
+    """Include (excluded=false) or exclude (excluded=true) a scene from the NDVI trend."""
+    scene = db.get_scene(scene_id)
+    if not scene:
+        raise HTTPException(status_code=404, detail="Scene not found")
+    db.set_scene_trend(scene_id, excluded)
     return {"scene": db.get_scene(scene_id)}
 
 
