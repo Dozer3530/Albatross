@@ -316,19 +316,18 @@ function sceneCard(scene) {
         </div>
       </div>
       <div class="sc-footer">
+        <span class="sc-footer-label">OVERLAY</span>
         <div class="seg">
           <button class="btn btn-tiny" data-ov="${scene.id}:ndvi">NDVI</button>
           <button class="btn btn-tiny" data-ov="${scene.id}:truecolor">RGB</button>
         </div>
-        <details class="dl">
-          <summary>&#10515; DATA</summary>
-          <div class="dl-menu">
-            <a href="/api/scenes/${scene.id}/files/ndvi_raw?download=1">NDVI GeoTIFF <span class="dl-kind">float32</span></a>
-            <a href="/api/scenes/${scene.id}/files/ndvi?download=1">NDVI map <span class="dl-kind">png</span></a>
-            <a href="/api/scenes/${scene.id}/files/truecolor?download=1">True color <span class="dl-kind">png</span></a>
-            <a href="/api/scenes/${scene.id}/files/scl?download=1">Scene class. <span class="dl-kind">tiff</span></a>
-          </div>
-        </details>
+      </div>
+      <div class="sc-downloads">
+        <span class="dl-label">&#10515; DOWNLOAD</span>
+        <a class="dl-pill" href="/api/scenes/${scene.id}/files/ndvi_raw?download=1" title="NDVI as float32 GeoTIFF">NDVI<em>.tif</em></a>
+        <a class="dl-pill" href="/api/scenes/${scene.id}/files/ndvi?download=1" title="NDVI color map PNG">NDVI<em>.png</em></a>
+        <a class="dl-pill" href="/api/scenes/${scene.id}/files/truecolor?download=1" title="True-color PNG">RGB<em>.png</em></a>
+        <a class="dl-pill" href="/api/scenes/${scene.id}/files/scl?download=1" title="Scene classification TIFF">SCL<em>.tif</em></a>
       </div>`;
   }
 
@@ -640,13 +639,6 @@ function bindUI() {
 
   $("#overlayOpacity").addEventListener("input", (e) => {
     if (State.overlay) State.overlay.setOpacity((+e.target.value) / 100);
-  });
-
-  // close any open download menus when clicking elsewhere
-  document.addEventListener("click", (e) => {
-    document.querySelectorAll("details.dl[open]").forEach((d) => {
-      if (!d.contains(e.target)) d.removeAttribute("open");
-    });
   });
 }
 

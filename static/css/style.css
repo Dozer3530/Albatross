@@ -430,37 +430,29 @@ main {
 .sc-minmax { font-size: 10px; color: var(--muted); margin-top: 6px; line-height: 1.7; letter-spacing: .03em; }
 .sc-minmax b { color: var(--ink); font-weight: 400; }
 
-.sc-footer { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.sc-footer { display: flex; gap: 9px; margin-top: 10px; align-items: center; }
+.sc-footer-label { font-size: 9px; letter-spacing: .22em; color: var(--faint); flex-shrink: 0; }
 .seg { display: flex; flex: 1; }
 .seg .btn { flex: 1; border-right-width: 0; clip-path: none; }
 .seg .btn:last-child { border-right-width: 1px; }
 .seg .btn.active { color: #000; background: var(--acid); border-color: var(--acid); }
 
-.dl { position: relative; }
-.dl summary {
-  list-style: none; cursor: pointer;
-  font-size: 10px; letter-spacing: .12em;
-  padding: 7px 11px; border: 1px solid #cfcfd6; background: #0d0d0f;
-  transition: background .12s, color .12s;
+/* always-visible download chips (no overflow-clipped popup) */
+.sc-downloads {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin-top: 9px; padding-top: 9px;
+  border-top: 1px solid var(--line);
 }
-.dl summary::-webkit-details-marker { display: none; }
-.dl summary:hover { background: #e8e8ee; color: #000; }
-.dl-menu {
-  position: absolute; right: 0; top: calc(100% + 4px); z-index: 50;
-  background: #000; border: 1px solid #cfcfd6;
-  min-width: 190px;
-  box-shadow: 6px 6px 0 rgba(232, 232, 238, .12);
-}
-.dl-menu a {
-  display: block; padding: 8px 12px;
-  font-size: 10px; letter-spacing: .1em;
+.dl-label { font-size: 9px; letter-spacing: .22em; color: var(--muted); margin-right: 2px; }
+.dl-pill {
+  font-size: 10px; letter-spacing: .06em;
   color: var(--ink); text-decoration: none;
-  border-bottom: 1px solid var(--line);
+  padding: 4px 8px; border: 1px solid var(--line-bright); background: #0d0d0f;
+  transition: background .12s, color .12s, border-color .12s;
 }
-.dl-menu a:last-child { border-bottom: 0; }
-.dl-menu a:hover { background: var(--acid); color: #000; }
-.dl-menu .dl-kind { color: var(--faint); float: right; }
-.dl-menu a:hover .dl-kind { color: #000; }
+.dl-pill em { font-style: normal; color: var(--faint); }
+.dl-pill:hover { background: var(--acid); border-color: var(--acid); color: #000; text-decoration: none; }
+.dl-pill:hover em { color: #0a0c00; }
 
 .scene-empty {
   font-size: 11px; color: var(--faint);
