@@ -70,6 +70,9 @@ You need two things once: **Python** and a **free Copernicus account**.
   `.gpkg`, zipped shapefile (`.zip`), loose shapefile set (`.shp`+`.shx`+`.dbf`+…),
   `.geojson` / `.json`, `.kml`, `.fgb`, `.gml`. Every polygon feature becomes a
   tracked field (multi-layer files are read in full).
+- **Remove a field** — hover a field card in the sidebar and click the **×** in
+  its corner, or open a field and use the **DEL** button in its panel. Either
+  way asks you to confirm, then deletes the field and its downloaded imagery.
 - **Scan for passes** — happens automatically on page load; the SCAN button
   re-queries on demand. New acquisitions show an amber **NEW** badge, with
   per-scene cloud cover from the catalog. Use the **lookback dropdown** next to

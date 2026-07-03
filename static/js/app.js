@@ -185,6 +185,7 @@ function renderFieldList() {
     card.className = "field-card" + (State.selected && State.selected.id === field.id ? " selected" : "");
     card.style.animationDelay = `${i * 40}ms`;
     card.innerHTML = `
+      <button class="fc-del" title="Remove this field and its imagery">&times;</button>
       <div class="fc-row1">
         <span class="fc-name">${escapeHtml(field.name)}</span>
         <span class="fc-area">${fmtNum(field.area_ha, 1)} ha</span>
@@ -197,6 +198,10 @@ function renderFieldList() {
               ? `<span class="fc-ndvi">NDVI ${fmtNum(field.latest_ndvi)}</span>` : "")}
       </div>`;
     card.addEventListener("click", () => selectField(field.id));
+    card.querySelector(".fc-del").addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteField(field.id, field.name);
+    });
     list.appendChild(card);
   });
 }
@@ -245,11 +250,14 @@ function closePanel() {
 
 async function deleteSelectedField() {
   if (!State.selected) return;
-  const name = State.selected.name;
+  await deleteField(State.selected.id, State.selected.name);
+}
+
+async function deleteField(fieldId, name) {
   if (!confirm(`Remove field "${name}" and all downloaded imagery?`)) return;
-  await api(`/api/fields/${State.selected.id}`, { method: "DELETE" });
+  await api(`/api/fields/${fieldId}`, { method: "DELETE" });
   toast(`FIELD REMOVED // ${name.toUpperCase()}`, "warn");
-  closePanel();
+  if (State.selected && State.selected.id === fieldId) closePanel();
   await loadFields({ fit: State.fields.length > 1 });
 }
 

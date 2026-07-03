@@ -270,6 +270,19 @@ main {
 }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .field-card:hover { border-color: #cfcfd6; }
+
+.fc-del {
+  position: absolute; top: 2px; right: 2px; z-index: 2;
+  width: 20px; height: 20px;
+  display: none; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1;
+  color: var(--muted); background: var(--bg-2);
+  border: 1px solid var(--line-bright);
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.field-card:hover .fc-del { display: flex; }
+.fc-del:hover { background: var(--danger); border-color: var(--danger); color: #000; }
 .field-card.selected {
   border-color: var(--acid);
   box-shadow: 0 0 16px var(--glow), inset 0 0 24px rgba(204, 255, 0, 0.04);
