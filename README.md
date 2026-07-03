@@ -17,14 +17,19 @@ You need two things once: **Python** and a **free Copernicus account**.
 2. **Download Albatross** — on the [GitHub page](https://github.com/Dozer3530/Albatross),
    grab the latest [**Release**](https://github.com/Dozer3530/Albatross/releases/latest)
    (the `Source code (zip)`), or click the green **Code ▾ → Download ZIP** button.
-   Right-click the downloaded `.zip` → **Extract All**.
 
-3. **Double-click `run.bat`** in the extracted folder. The first launch installs
+3. **Extract the ZIP first — this step is required.** Right-click the downloaded
+   `.zip` → **Extract All…** → **Extract**. Then open the extracted folder.
+   ⚠️ **Do not double-click `run.bat` while still inside the ZIP preview** — Windows
+   only unpacks that one file to a temp folder, so it can't find the rest of the app
+   and you'll get a *"could not open requirements file"* error.
+
+4. **Double-click `run.bat`** in the extracted folder. The first launch installs
    everything it needs (a minute or two), then opens the dashboard in your browser
    at <http://127.0.0.1:8137>. Every launch after that is instant. Close the black
    console window (or press Ctrl+C in it) to stop the server.
 
-4. **Connect your account** — the first time, the *Uplink Config* dialog opens.
+5. **Connect your account** — the first time, the *Uplink Config* dialog opens.
    Paste your Copernicus **Client ID + Secret** (see below) and hit
    *Save & Test Uplink*. That's it — your fields and imagery are stored locally on
    your own machine.

@@ -6,6 +6,27 @@ REM ===========================================================
 setlocal
 cd /d "%~dp0"
 
+REM --- make sure we're actually in the extracted app folder --
+if not exist "requirements.txt" (
+    echo.
+    echo  ============================================================
+    echo   [Albatross] The app files were not found next to run.bat.
+    echo   Current folder:
+    echo     %CD%
+    echo.
+    echo   This almost always means run.bat was started from INSIDE
+    echo   the downloaded .zip. Windows only unpacks this one file to
+    echo   a temporary folder, so the rest of the app is missing.
+    echo.
+    echo   FIX: close this window, then in your Downloads folder
+    echo   right-click the Albatross .zip  -^>  "Extract All...",
+    echo   open the extracted folder, and double-click run.bat there.
+    echo  ============================================================
+    echo.
+    pause
+    exit /b 1
+)
+
 REM --- self-update if this folder is a git checkout ----------
 if exist ".git" (
     where git >nul 2>&1 && (

@@ -5,6 +5,19 @@
 $ErrorActionPreference = "Stop"
 Set-Location -Path $PSScriptRoot
 
+# --- make sure we're actually in the extracted app folder ----
+if (-not (Test-Path "requirements.txt")) {
+    Write-Host ""
+    Write-Host " [Albatross] The app files were not found next to run.ps1." -ForegroundColor Yellow
+    Write-Host "   Current folder: $((Get-Location).Path)"
+    Write-Host ""
+    Write-Host "   This usually means it was started from INSIDE the .zip."
+    Write-Host "   FIX: right-click the Albatross .zip -> 'Extract All...', then"
+    Write-Host "        run this from the extracted folder." -ForegroundColor Cyan
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
 # --- make sure Python is available ---------------------------
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
     Write-Host "[Albatross] Python was not found on your PATH." -ForegroundColor Yellow
