@@ -8,7 +8,7 @@ import time
 
 import requests
 
-APP_VERSION = "1.1.1"
+APP_VERSION = "1.1.2"
 REPO = "Dozer3530/Albatross"
 RELEASES_API = f"https://api.github.com/repos/{REPO}/releases/latest"
 REPO_URL = f"https://github.com/{REPO}"

@@ -4,7 +4,9 @@ REM  ALBATROSS  -  Sentinel-2 field console launcher
 REM  Double-click this file to start the dashboard.
 REM ===========================================================
 setlocal
-cd /d "%~dp0"
+REM pushd (not cd) so this also works from a network / UNC path
+REM (\\server\share\...): it maps the share to a temp drive letter.
+pushd "%~dp0"
 
 REM --- make sure we're actually in the extracted app folder --
 if not exist "requirements.txt" (
@@ -14,15 +16,15 @@ if not exist "requirements.txt" (
     echo   Current folder:
     echo     %CD%
     echo.
-    echo   This almost always means run.bat was started from INSIDE
-    echo   the downloaded .zip. Windows only unpacks this one file to
-    echo   a temporary folder, so the rest of the app is missing.
-    echo.
-    echo   FIX: close this window, then in your Downloads folder
-    echo   right-click the Albatross .zip  -^>  "Extract All...",
-    echo   open the extracted folder, and double-click run.bat there.
+    echo   Two common causes:
+    echo     1) run.bat was started from INSIDE the downloaded .zip.
+    echo        Right-click the .zip -^> "Extract All...", then run
+    echo        run.bat from the extracted folder.
+    echo     2) The folder is missing files - re-download and extract
+    echo        the whole ZIP again.
     echo  ============================================================
     echo.
+    popd
     pause
     exit /b 1
 )
@@ -65,4 +67,5 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8137
 
 echo.
 echo [Albatross] Server stopped.
+popd
 pause
