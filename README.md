@@ -7,13 +7,34 @@ over your fields. Pick a pass, and it downloads *just your field's pixels*,
 computes NDVI + statistics, overlays the result on the map, and lets you download
 the imagery (float32 NDVI GeoTIFF, NDVI map PNG, true-color PNG, scene-classification TIFF).
 
-## Quick start
+## Get it running (Windows — the easy way)
 
-**Windows:** just double-click **`run.bat`**. It installs dependencies on first
-run, starts the server, and opens the dashboard in your browser. (You still need
-Python 3.11+ installed and your Copernicus credentials — see steps 2 below.)
+You need two things once: **Python** and a **free Copernicus account**.
 
-## Setup (manual)
+1. **Install Python 3.11+** — get it from [python.org/downloads](https://www.python.org/downloads/).
+   On the first installer screen, **tick "Add Python to PATH"**, then click Install.
+
+2. **Download Albatross** — on the [GitHub page](https://github.com/Dozer3530/Albatross),
+   grab the latest [**Release**](https://github.com/Dozer3530/Albatross/releases/latest)
+   (the `Source code (zip)`), or click the green **Code ▾ → Download ZIP** button.
+   Right-click the downloaded `.zip` → **Extract All**.
+
+3. **Double-click `run.bat`** in the extracted folder. The first launch installs
+   everything it needs (a minute or two), then opens the dashboard in your browser
+   at <http://127.0.0.1:8137>. Every launch after that is instant. Close the black
+   console window (or press Ctrl+C in it) to stop the server.
+
+4. **Connect your account** — the first time, the *Uplink Config* dialog opens.
+   Paste your Copernicus **Client ID + Secret** (see below) and hit
+   *Save & Test Uplink*. That's it — your fields and imagery are stored locally on
+   your own machine.
+
+> **Staying up to date:** Albatross checks GitHub for a newer version each time it
+> starts. If one exists, a pink **UPDATE** tag appears in the top bar — click it to
+> download the new release. (If you cloned with `git`, `run.bat` pulls the update
+> for you automatically.)
+
+## Setup (manual / macOS / Linux)
 
 1. **Install dependencies** (Python 3.11+):
 

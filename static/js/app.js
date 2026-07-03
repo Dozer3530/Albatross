@@ -642,6 +642,21 @@ function bindUI() {
   });
 }
 
+async function checkForUpdate() {
+  // fire-and-forget: never let a version check slow down or break startup
+  try {
+    const info = await api("/api/update-check");
+    if (info && info.update_available && info.latest) {
+      const chip = $("#updateChip");
+      $("#updateChipText").textContent = `UPDATE → v${info.latest}`;
+      chip.href = info.url;
+      chip.title = `Albatross v${info.latest} is available (you have v${info.current}). Click to download.`;
+      chip.classList.remove("hidden");
+      toast(`UPDATE AVAILABLE // v${info.latest} — you have v${info.current}. Click the pink UPDATE tag to get it.`, "warn", 9000);
+    }
+  } catch (_) { /* offline or rate-limited — silent */ }
+}
+
 async function init() {
   initMap();
   bindUI();
@@ -653,6 +668,7 @@ async function init() {
     // auto-check for new imagery on every open/refresh
     scanAll({ silent: true });
   }
+  checkForUpdate();
 }
 
 document.addEventListener("DOMContentLoaded", init);

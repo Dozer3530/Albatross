@@ -11,9 +11,10 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from backend import copernicus, db, geo, processing
+from backend import copernicus, db, geo, processing, version
 
-app = FastAPI(title="Albatross", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI(title="Albatross", version=version.APP_VERSION,
+              docs_url="/api/docs", openapi_url="/api/openapi.json")
 db.init_db()
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -33,6 +34,18 @@ class SettingsIn(BaseModel):
     client_secret: Optional[str] = None
     access_token: Optional[str] = None
     clear: bool = False
+
+
+# ----------------------------------------------------------------- version
+
+@app.get("/api/version")
+def get_version():
+    return {"version": version.APP_VERSION}
+
+
+@app.get("/api/update-check")
+def update_check(force: bool = False):
+    return version.check_for_update(force=force)
 
 
 # ---------------------------------------------------------------- settings

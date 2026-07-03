@@ -6,6 +6,14 @@ REM ===========================================================
 setlocal
 cd /d "%~dp0"
 
+REM --- self-update if this folder is a git checkout ----------
+if exist ".git" (
+    where git >nul 2>&1 && (
+        echo [Albatross] Checking for updates...
+        git pull --ff-only
+    )
+)
+
 REM --- make sure Python is available -------------------------
 python --version >nul 2>&1
 if errorlevel 1 (
